@@ -17,8 +17,15 @@ const numbers = _.range(0, (props.squares * 2) -1 , 1);
       :key="yCoord">
       <td v-for="xCoord in numbers" 
         :key="xCoord-yCoord"
+        style="height: 30px; width:30px;"
         v-bind:class="(xCoord % 2 == 0 && yCoord % 2 == 0)?'piece':(xCoord % 2 == 0)?'yPath':(yCoord % 2 ==0)?'xPath':'nothing'  ">
-        ({{ xCoord }},{{ yCoord }})
+        
+        <div class="container">
+           <hr style="vertical-align: middle; width:30px;" v-if="(yCoord % 2 == 0 && xCoord % 2 == 1)"/>
+
+           <hr style="transform: rotate(90deg); width:30px;" v-if="(yCoord % 2 == 1 && xCoord % 2 == 0)"/>
+        </div>
+
       </td>
     </tr>
   </table>
@@ -27,14 +34,13 @@ const numbers = _.range(0, (props.squares * 2) -1 , 1);
 
 <style scoped>
 
+
 .piece {
+  border: 2px;
   border-style: solid;
 }
 
 .xPath {
-  width: 100%;
-  height: 2px;
-  background-color: black;
 }
 
 .yPath {
