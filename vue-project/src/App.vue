@@ -19,33 +19,29 @@ const aiPiece3 = new PieceData(6, false, 0, 0);
 const pieceLocations : [PieceData, number, number][] = [];
 
 pieceLocations.push([human1, 0, 0]);
-pieceLocations.push([human2, 8, 0]);
-pieceLocations.push([human3, 16, 0]);
+pieceLocations.push([human2, 6, 0]);
+pieceLocations.push([human3, 12, 0]);
 
-pieceLocations.push([aiPiece1, 0, 16]);
-pieceLocations.push([aiPiece2, 8, 16]);
-pieceLocations.push([aiPiece3, 16, 16]);
+pieceLocations.push([aiPiece1, 0, 12]);
+pieceLocations.push([aiPiece2, 6, 12]);
+pieceLocations.push([aiPiece3, 12, 12]);
 
 
 
 </script>
 
 <template>
-  <div class="container">
+  <div>
     <div class="wrapper">
       <Title msg="LifeCycle: The Game" style="text-align: center" />
     </div>
   
-  <Grid :squares=9 :pieces=pieceLocations ></Grid>
+  <Grid :squares=7 :pieces=pieceLocations ></Grid>
   </div>
 </template>
 
 <style scoped>
 
-.container {
-    display: grid;
-    place-items: center; /* Centers both horizontally and vertically */
-}
 
 header {
   line-height: 1.5;
