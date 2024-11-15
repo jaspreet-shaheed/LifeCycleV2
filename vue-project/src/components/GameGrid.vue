@@ -40,16 +40,22 @@ const routeBeingUsed = function (x: number, y: number): boolean {
   )
 }
 
+const routeInFinishedPaths = function (x: number, y: number): boolean {
+  return existingPaths.some(
+    (e) =>
+      e[1].findIndex((p: [number, number]) => {
+        return p[0] === x && p[1] === y
+      }) !== -1,
+  )
+}
+
 const dragBegin = function (event: DragEvent, pieceId: number): void {
   pieceBeingPlanned.value = pieceId
   pathBeingPlanned.splice(0)
 }
 
 const dragOver = function (x: number, y: number): void {
-  console.log('dragOver', x, y)
-  console.log('pathBeingPlanned', pathBeingPlanned.length)
   if (pathBeingPlanned.length === 0 && !isNothingSquare(x, y) && selectedX.value !== -1) {
-    console.log('pushing coords', x, y)
     pathBeingPlanned.push([x, y])
   } else {
     const [firstX, firstY] = pathBeingPlanned[0]
@@ -68,12 +74,11 @@ const dragOver = function (x: number, y: number): void {
 }
 
 const acceptPath = function (): void {
-  existingPaths.push([pieceBeingPlanned.value, pathBeingPlanned])
+  existingPaths.push([pieceBeingPlanned.value, [...pathBeingPlanned]])
   cancelPath()
 }
 
 const cancelPath = function (): void {
-  console.log('Calling cancel path')
   pieceBeingPlanned.value = -1
   pathBeingPlanned.splice(0)
   selectedX.value = -1
@@ -107,6 +112,12 @@ const identifyPathClass = function (x: number, y: number): string {
     } else if (isVerticalRoute(x, y)) {
       return 'selectedYPath'
     }
+  } else if (routeInFinishedPaths(x, y)) {
+    if (isHorizontalRoute(x, y)) {
+      return 'selectedB4XPath'
+    } else if (isVerticalRoute(x, y)) {
+      return 'selectedB4YPath'
+    }
   } else {
     if (isHorizontalRoute(x, y)) {
       return 'xPath'
@@ -124,6 +135,8 @@ const identifyPieceClass = function (x: number, y: number): string {
 
   if (routeBeingUsed(x, y)) {
     return 'selectedPiecePath'
+  } else if (routeInFinishedPaths(x, y)) {
+    return 'selectedB4PiecePath'
   } else {
     return 'piece'
   }
@@ -138,8 +151,11 @@ const select = function (x: number, y: number): void {
 <template>
   <div>
     <div>
-      <button type="button" class="btn btn-success" @click="acceptPath">Set Path</button> &nbsp;
-      <button type="button" class="btn btn-danger" @click="cancelPath">Cancel</button>
+      <button type="button" class="btn btn-success text-center" @click="acceptPath">
+        Set Path
+      </button>
+      &nbsp;
+      <button type="button" class="btn btn-danger text-center" @click="cancelPath">Cancel</button>
       <hr />
     </div>
     <table>
@@ -184,10 +200,26 @@ const select = function (x: number, y: number): void {
   border-color: lime;
 }
 
+.selectedB4XPath {
+  vertical-align: middle;
+  border-color: blue;
+}
+
+.selectedB4YPath {
+  transform: rotate(90deg);
+  border-color: blue;
+}
+
 .selectedPiecePath {
   border: 2px;
   border-style: solid;
   border-color: lime;
+}
+
+.selectedB4PiecePath {
+  border: 2px;
+  border-style: solid;
+  border-color: blue;
 }
 
 .xPath {
