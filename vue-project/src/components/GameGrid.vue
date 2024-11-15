@@ -24,11 +24,6 @@ const getPieceData = function (x: number, y: number): PieceData {
   throw new Error('No piece here')
 }
 
-//const getPieceLocation = function(x: number) : [number, number] {
-//  const pieceAndLocation = props.pieces.find(p => p[0].id === x)!;
-//  return [pieceAndLocation[1], pieceAndLocation[2]];
-//}
-
 const selectedX = ref(-1),
   selectedY = ref(-1),
   pieceBeingPlanned = ref(-1)
@@ -48,13 +43,13 @@ const routeBeingUsed = function (x: number, y: number): boolean {
 const dragBegin = function (event: DragEvent, pieceId: number): void {
   pieceBeingPlanned.value = pieceId
   pathBeingPlanned.splice(0)
-  if (event !== null && event.dataTransfer !== null) {
-    event.dataTransfer.effectAllowed = 'move'
-  }
 }
 
 const dragOver = function (x: number, y: number): void {
+  console.log('dragOver', x, y)
+  console.log('pathBeingPlanned', pathBeingPlanned.length)
   if (pathBeingPlanned.length === 0 && !isNothingSquare(x, y) && selectedX.value !== -1) {
+    console.log('pushing coords', x, y)
     pathBeingPlanned.push([x, y])
   } else {
     const [firstX, firstY] = pathBeingPlanned[0]
@@ -66,7 +61,6 @@ const dragOver = function (x: number, y: number): void {
         // valid path
         pathBeingPlanned.unshift([x, y])
       } else {
-        // invalid path, so clear
         cancelPath()
       }
     }
@@ -79,6 +73,7 @@ const acceptPath = function (): void {
 }
 
 const cancelPath = function (): void {
+  console.log('Calling cancel path')
   pieceBeingPlanned.value = -1
   pathBeingPlanned.splice(0)
   selectedX.value = -1
@@ -135,7 +130,6 @@ const identifyPieceClass = function (x: number, y: number): string {
 }
 
 const select = function (x: number, y: number): void {
-  console.log('x,  y', x, y)
   selectedX.value = x
   selectedY.value = y
 }
@@ -144,15 +138,15 @@ const select = function (x: number, y: number): void {
 <template>
   <div>
     <div>
-      <button type="button" class="btn btn-success" :click="acceptPath()">Set Path</button> &nbsp;
-      <button type="button" class="btn btn-danger" :click="cancelPath()">Cancel</button>
+      <button type="button" class="btn btn-success" @click="acceptPath">Set Path</button> &nbsp;
+      <button type="button" class="btn btn-danger" @click="cancelPath">Cancel</button>
       <hr />
     </div>
     <table>
       <tr v-for="yCoord in numbers" :key="yCoord">
         <td
           v-for="xCoord in numbers"
-          :key="xCoord - yCoord - selectedX - selectedY"
+          :key="xCoord + ' ' + yCoord"
           style="height: 30px; width: 30px"
           @dragover="dragOver(xCoord, yCoord)"
           v-bind:class="isPieceSquare(xCoord, yCoord) ? identifyPieceClass(xCoord, yCoord) : ''"
@@ -169,7 +163,7 @@ const select = function (x: number, y: number): void {
             <GamePiece
               v-if="hasPiece(xCoord, yCoord)"
               :piece-data="getPieceData(xCoord, yCoord)"
-              @click-select="select(xCoord, yCoord)"
+              @click="select(xCoord, yCoord)"
               @drag-begin="dragBegin"
             />
           </div>
