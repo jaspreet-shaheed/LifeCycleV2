@@ -74,7 +74,6 @@ const dragOver = function (x: number, y: number): void {
 }
 
 const acceptPath = function (): void {
-  existingPaths.push([pieceBeingPlanned.value, [...pathBeingPlanned]])
   cancelPath()
 }
 
