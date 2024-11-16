@@ -2,12 +2,26 @@
 import * as _ from 'lodash'
 import GamePiece from './GamePiece.vue'
 import PieceData from './PieceData.js'
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 
 const props = defineProps<{
   squares: number
   pieces: [PieceData, number, number][]
 }>()
+
+import { pathStore } from './../main'
+
+// access the `store` variable anywhere in the component ✨
+
+let storeReady: boolean = false
+function getStore() {
+  return storeReady ? pathStore() : { allPaths: [] }
+}
+
+onMounted(() => {
+  console.log('Component is mounted')
+  storeReady = true
+})
 
 const numbers = _.range(0, props.squares * 2 - 1, 1)
 
@@ -30,7 +44,6 @@ const selectedX = ref(-1),
 
 // eslint-disable-next-line prefer-const
 let pathBeingPlanned: [number, number][] = reactive([])
-const existingPaths: [number, [number, number][]][] = reactive([])
 
 const routeBeingUsed = function (x: number, y: number): boolean {
   return (
@@ -41,7 +54,7 @@ const routeBeingUsed = function (x: number, y: number): boolean {
 }
 
 const routeInFinishedPaths = function (x: number, y: number): boolean {
-  return existingPaths.some(
+  return getStore().allPaths.some(
     (e) =>
       e[1].findIndex((p: [number, number]) => {
         return p[0] === x && p[1] === y
@@ -74,6 +87,7 @@ const dragOver = function (x: number, y: number): void {
 }
 
 const acceptPath = function (): void {
+  getStore().addPath(pieceBeingPlanned.value, pathBeingPlanned)
   cancelPath()
 }
 
@@ -201,11 +215,13 @@ const select = function (x: number, y: number): void {
 
 .selectedB4XPath {
   vertical-align: middle;
+  border-style: dashed;
   border-color: blue;
 }
 
 .selectedB4YPath {
   transform: rotate(90deg);
+  border-style: dashed;
   border-color: blue;
 }
 

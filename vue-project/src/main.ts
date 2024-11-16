@@ -1,11 +1,21 @@
 import './assets/main.css'
 
 import { createApp } from 'vue'
-
 import App from './App.vue'
 import { defineStore } from 'pinia'
+import { createPinia } from 'pinia'
 
-export const usePathStore = defineStore('paths', {
+interface StoreState {
+  paths: [number, [number, number][]][]
+}
+
+const pinia = createPinia()
+const app = createApp(App)
+
+app.use(pinia)
+app.mount('#app')
+
+export const pathStore = defineStore('paths', {
   state: (): StoreState => ({
     paths: [],
   }),
@@ -36,9 +46,3 @@ export const usePathStore = defineStore('paths', {
     },
   },
 })
-
-interface StoreState {
-  paths: [number, [number, number][]][]
-}
-
-createApp(App).mount('#app')
