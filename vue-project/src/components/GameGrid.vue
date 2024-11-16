@@ -15,7 +15,10 @@ import { pathStore } from './../main'
 
 let storeReady: boolean = false
 function getStore() {
-  return storeReady ? pathStore() : { allPaths: [] }
+  return storeReady
+    ? pathStore()
+    : // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      { allPaths: [], addPath: (_: number, _2: [number, number][]) => {} }
 }
 
 onMounted(() => {

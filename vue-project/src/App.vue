@@ -2,8 +2,7 @@
 import Title from './components/TitleBanner.vue'
 import Grid from './components/GameGrid.vue'
 import PieceData from './components/PieceData'
-
-//const pieces : PieceData[] = [];
+import { onMounted } from 'vue'
 
 const human1 = new PieceData(1, true, 0, 0)
 const human2 = new PieceData(2, true, 0, 0)
@@ -12,8 +11,6 @@ const human3 = new PieceData(3, true, 0, 0)
 const aiPiece1 = new PieceData(4, false, 0, 0)
 const aiPiece2 = new PieceData(5, false, 0, 0)
 const aiPiece3 = new PieceData(6, false, 0, 0)
-
-//pieces.push([human1, human2, human3, aiPiece1, aiPiece2, aiPiece3]);
 
 const pieceLocations: [PieceData, number, number][] = []
 
@@ -24,6 +21,15 @@ pieceLocations.push([human3, 12, 0])
 pieceLocations.push([aiPiece1, 0, 12])
 pieceLocations.push([aiPiece2, 6, 12])
 pieceLocations.push([aiPiece3, 12, 12])
+
+const tick = function (): void {
+  pieceLocations.forEach(pl => pl[0].)
+
+}
+
+onMounted(() => {
+  window.setInterval(tick, 1000)
+})
 </script>
 
 <template>
