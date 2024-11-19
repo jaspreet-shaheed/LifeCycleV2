@@ -3,6 +3,7 @@ import * as _ from 'lodash'
 import GamePiece from './GamePiece.vue'
 import PieceData from './PieceData.js'
 import { onMounted, reactive, ref } from 'vue'
+const emit = defineEmits(['pieceSelected'])
 
 const props = defineProps<{
   squares: number
@@ -73,7 +74,7 @@ const dragBegin = function (event: DragEvent, pieceId: number): void {
 const dragOver = function (x: number, y: number): void {
   if (pathBeingPlanned.length === 0 && !isNothingSquare(x, y) && selectedX.value !== -1) {
     pathBeingPlanned.push([x, y])
-  } else {
+  } else if (pathBeingPlanned.length > 0) {
     const [firstX, firstY] = pathBeingPlanned[0]
     if (!(firstX === x && firstY === y)) {
       if (
@@ -161,6 +162,10 @@ const identifyPieceClass = function (x: number, y: number): string {
 const select = function (x: number, y: number): void {
   selectedX.value = x
   selectedY.value = y
+  const pd = getPieceData(x, y)
+  if (pd) {
+    emit('pieceSelected', pd.id)
+  }
 }
 </script>
 
@@ -192,12 +197,14 @@ const select = function (x: number, y: number): void {
           </div>
 
           <div v-if="isPieceSquare(xCoord, yCoord)">
-            <GamePiece
-              v-if="hasPiece(xCoord, yCoord)"
-              :piece-data="getPieceData(xCoord, yCoord)"
-              @click="select(xCoord, yCoord)"
-              @drag-begin="dragBegin"
-            />
+            <transition name="pieceMove">
+              <GamePiece
+                v-if="hasPiece(xCoord, yCoord)"
+                :piece-data="getPieceData(xCoord, yCoord)"
+                @click="select(xCoord, yCoord)"
+                @drag-begin="dragBegin"
+              />
+            </transition>
           </div>
         </td>
       </tr>
@@ -206,6 +213,16 @@ const select = function (x: number, y: number): void {
 </template>
 
 <style scoped>
+.pieceMove-enter-active,
+.pieceMove-leave-active {
+  transition: opacity 1s ease;
+}
+
+.pieceMove-enter-from,
+.pieceMove-leave-to {
+  opacity: 0;
+}
+
 .selectedXPath {
   vertical-align: middle;
   border-color: lime;
