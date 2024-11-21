@@ -17,6 +17,10 @@ export default class PieceData {
     return this._damage
   }
 
+  public get readyToMovePercent(): number {
+    return this._readyToMovePercent
+  }
+
   public readyToMove(): boolean {
     return this._readyToMovePercent === 100
   }
@@ -29,6 +33,19 @@ export default class PieceData {
     if (this._readyToMovePercent < 100) {
       this._readyToMovePercent++
     }
+    if (this._goingUp) {
+      if (this._lifeStrength < 100) {
+        this._lifeStrength++
+      } else {
+        this._goingUp = false
+      }
+    } else {
+      if (this._lifeStrength > 0) {
+        this._lifeStrength--
+      } else {
+        this._goingUp = true
+      }
+    }
   }
 
   private _id: number
@@ -36,6 +53,7 @@ export default class PieceData {
   private _damage: number
   private _isHuman: boolean
   private _readyToMovePercent: number
+  private _goingUp: boolean
 
   constructor(id: number, isHuman: boolean, lifeStrength: number, damage: number) {
     this._id = id
@@ -43,5 +61,6 @@ export default class PieceData {
     this._lifeStrength = lifeStrength
     this._damage = damage
     this._readyToMovePercent = 100
+    this._goingUp = true
   }
 }

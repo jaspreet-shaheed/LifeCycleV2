@@ -164,6 +164,7 @@ const select = function (x: number, y: number): void {
   selectedY.value = y
   const pd = getPieceData(x, y)
   if (pd) {
+    console.log('pieceSeleted', pd.id)
     emit('pieceSelected', pd.id)
   }
 }

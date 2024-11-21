@@ -1,9 +1,32 @@
 <script setup lang="ts">
 import PieceData from './PieceData'
+import { onMounted, watch } from 'vue'
 
 const props = defineProps<{
   pieceData: PieceData
 }>()
+
+const getColor = function (): string {
+  return props.pieceData.isHuman
+    ? 'rgb(0, ' + (2 * props.pieceData.lifeStrength + 50) + ', 0)'
+    : 'rgb(' + (2 * props.pieceData.lifeStrength + 50) + ', 0, 0)'
+}
+
+onMounted(() => {
+  const el = document.getElementById(getId())!
+  el.style.backgroundColor = getColor()
+})
+
+watch(props.pieceData, () => {
+  const el = document.getElementById(getId())
+  if (el) {
+    el.style.backgroundColor = getColor()
+  }
+})
+
+const getId = function () {
+  return props.pieceData.id + '-piece'
+}
 </script>
 
 <template>
@@ -14,8 +37,7 @@ const props = defineProps<{
     v-on:dragstart="(e: DragEvent) => $emit('dragBegin', e, props.pieceData.id)"
     v-on:dragover="$emit('dragOverPiece', props.pieceData.id)"
   >
-    <div v-if="props.pieceData.isHuman" class="dot human" style="vertical-align: middle"></div>
-    <div v-else class="dot ai" style="vertical-align: middle"></div>
+    <div class="dot" :id="getId()" style="vertical-align: middle"></div>
   </div>
 </template>
 
@@ -39,6 +61,7 @@ const props = defineProps<{
   margin: auto;
   border-radius: 50%;
   display: inline-block;
+  border-style: dotted;
 }
 
 .human {
