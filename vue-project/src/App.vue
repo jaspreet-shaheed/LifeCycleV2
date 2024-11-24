@@ -90,7 +90,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <div class="mt-5">
+    <div class="container my-5">
       <Title msg="The LifeCycle Game" style="text-align: center" />
     </div>
 
