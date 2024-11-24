@@ -6,13 +6,14 @@ const props = defineProps<{
   selectedPiece: PieceData | null
 }>()
 
-const movePercent = computed(
-  () => 'width: ' + (props.selectedPiece?.readyToMovePercent ?? 100) + '%',
-)
+const moveText = computed(() => (props.selectedPiece?.readyToMovePercent ?? 100) + '%')
+const movePercent = computed(() => 'width: ' + moveText.value)
 
-const lifeStrength = computed(() => 'width: ' + (props.selectedPiece?.lifeStrength ?? 100) + '%')
+const lifeText = computed(() => (props.selectedPiece?.lifeStrength ?? 100) + '%')
+const lifeStrength = computed(() => 'width: ' + lifeText.value)
 
-const damagePercent = computed(() => 'width: ' + (props.selectedPiece?.damage ?? 0) + '%')
+const damageText = computed(() => (props.selectedPiece?.damage ?? 0) + '%')
+const damagePercent = computed(() => 'width: ' + damageText.value)
 </script>
 
 <template>
@@ -33,7 +34,9 @@ const damagePercent = computed(() => 'width: ' + (props.selectedPiece?.damage ??
             <td>Move Ready</td>
             <td>
               <div class="progress">
-                <div class="progress-bar" role="progressbar" v-bind:style="movePercent"></div>
+                <div class="progress-bar" role="progressbar" v-bind:style="movePercent">
+                  {{ moveText }}
+                </div>
               </div>
             </td>
           </tr>
@@ -41,7 +44,9 @@ const damagePercent = computed(() => 'width: ' + (props.selectedPiece?.damage ??
             <td>Strength</td>
             <td>
               <div class="progress">
-                <div class="progress-bar" role="progressbar" v-bind:style="lifeStrength"></div>
+                <div class="progress-bar" role="progressbar" v-bind:style="lifeStrength">
+                  {{ lifeText }}
+                </div>
               </div>
             </td>
           </tr>
@@ -49,7 +54,9 @@ const damagePercent = computed(() => 'width: ' + (props.selectedPiece?.damage ??
             <td>Damage</td>
             <td>
               <div class="progress">
-                <div class="progress-bar" role="progressbar" v-bind:style="damagePercent"></div>
+                <div class="progress-bar" role="progressbar" v-bind:style="damagePercent">
+                  {{ damageText }}
+                </div>
               </div>
             </td>
           </tr>
