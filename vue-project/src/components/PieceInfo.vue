@@ -1,9 +1,18 @@
 <script setup lang="ts">
 import PieceData from './PieceData'
+import { computed } from 'vue'
 
 const props = defineProps<{
   selectedPiece: PieceData | null
 }>()
+
+const movePercent = computed(
+  () => 'width: ' + (props.selectedPiece?.readyToMovePercent ?? 100) + '%',
+)
+
+const lifeStrength = computed(() => 'width: ' + (props.selectedPiece?.lifeStrength ?? 100) + '%')
+
+const damagePercent = computed(() => 'width: ' + (props.selectedPiece?.damage ?? 0) + '%')
 </script>
 
 <template>
@@ -21,15 +30,29 @@ const props = defineProps<{
         </tr>
         <tr>
           <td>Move Ready</td>
-          <td>{{ props.selectedPiece.readyToMovePercent }}%</td>
+          <td>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" v-bind:style="movePercent"></div>
+            </div>
+          </td>
         </tr>
         <tr>
           <td>Strength</td>
-          <td>{{ props.selectedPiece.lifeStrength }}</td>
+          <td>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" v-bind:style="lifeStrength"></div>
+            </div>
+            {{ props.selectedPiece.lifeStrength }}
+          </td>
         </tr>
         <tr>
           <td>Damage</td>
-          <td>{{ props.selectedPiece.damage }}%</td>
+          <td>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" v-bind:style="damagePercent"></div>
+            </div>
+            {{ props.selectedPiece.damage }}
+          </td>
         </tr>
       </tbody>
     </table>
