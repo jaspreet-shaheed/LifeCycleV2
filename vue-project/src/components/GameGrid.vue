@@ -70,19 +70,22 @@ const dragBegin = function (event: DragEvent, pieceId: number): void {
 }
 
 const dragOver = function (x: number, y: number): void {
-  if (pathBeingPlanned.length === 0 && !isNothingSquare(x, y) && selectedX.value !== -1) {
+  console.log('dragover:', x, y)
+  if (isNothingSquare(x, y)) {
+    cancelPath()
+  }
+  if (pathBeingPlanned.length === 0 && selectedX.value !== -1) {
     pathBeingPlanned.push([x, y])
   } else if (pathBeingPlanned.length > 0) {
     const [firstX, firstY] = pathBeingPlanned[0]
     if (!(firstX === x && firstY === y)) {
       if (
-        (!isNothingSquare(x, y) && Math.abs(firstX - x) == 0 && Math.abs(firstY - y) == 1) ||
-        (Math.abs(firstX - x) == 1 && Math.abs(firstY - y) == 0)
+        (Math.abs(firstX - x) == 0 && Math.abs(firstY - y) == 2) ||
+        (Math.abs(firstX - x) == 2 && Math.abs(firstY - y) == 0)
       ) {
         // valid path
+        console.log('Valid path')
         pathBeingPlanned.unshift([x, y])
-      } else {
-        cancelPath()
       }
     }
   }
@@ -186,8 +189,8 @@ const select = function (x: number, y: number): void {
               v-for="xCoord in numbers"
               :key="xCoord + ' ' + yCoord"
               style="height: 30px; width: 30px"
-              @dragover="dragOver(xCoord, yCoord)"
               v-bind:class="isPieceSquare(xCoord, yCoord) ? identifyPieceClass(xCoord, yCoord) : ''"
+              @dragover="dragOver(xCoord, yCoord)"
             >
               <div v-if="isHorizontalRoute(xCoord, yCoord) || isVerticalRoute(xCoord, yCoord)">
                 <hr

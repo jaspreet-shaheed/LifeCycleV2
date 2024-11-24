@@ -34,19 +34,6 @@ const getPiece = (pieceId: number) => pieceLocations.find((p) => p[0].id === pie
 
 const getPieceLocation = (pieceId: number) => pieceLocations.find((p) => p[0].id === pieceId)
 
-const getDirection = function (x1: number, y1: number, x2: number, y2: number): direction {
-  if (x1 - x2 === 2) {
-    return direction.left
-  } else if (x1 - x2 === -2) {
-    return direction.right
-  } else if (y1 - y2 === 2) {
-    return direction.up
-  } else if (y1 - y2 === -2) {
-    return direction.down
-  }
-  throw new Error("Couldn't find direction " + x1 + ',' + y1 + ',' + x2 + ',' + y2)
-}
-
 const tick = function (): void {
   pieceLocations.forEach((pl) => pl[0].tick())
   const nextMoves: [number, [number, number]][] = getStore().getNextMoves
@@ -55,14 +42,14 @@ const tick = function (): void {
     if (pl[0].readyToMove()) {
       console.log('Ready to move', pl[0].id)
       console.log('From (' + pl[1] + ',' + pl[2] + ') to (' + el[1][0] + ',' + el[1][1] + ')')
-      const dir = getDirection(pl[1], pl[2], el[1][0], el[1][1])
+      //const dir = getDirection(pl[1], pl[2], el[1][0], el[1][1])
       pl[0].move()
       pl[1] = el[1][0]
       pl[2] = el[1][1]
       getStore().makeMove(pl[0].id)
 
-      console.log('Setting direction for piece: ' + pl[0].id + ' ' + dir)
-      getStore().updateDirection(pl[0].id, dir)
+      //console.log('Setting direction for piece: ' + pl[0].id + ' ' + dir)
+      //getStore().updateDirection(pl[0].id, dir)
     }
   })
 }

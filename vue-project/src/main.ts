@@ -30,7 +30,7 @@ export const pathStore = defineStore('paths', {
   getters: {
     allPaths: (state) => state.paths,
     getNextMoves: (state) => {
-      const res: [number, [number, number]][] = state.paths.map((p) => [p[0], p[1][1]])
+      const res: [number, [number, number]][] = state.paths.map((p) => [p[0], p[1][0]])
       return res
     },
     getDirections: (state) => state.directions,
@@ -57,22 +57,13 @@ export const pathStore = defineStore('paths', {
     },
     makeMove(pieceId: number) {
       const el = this.paths.find((ep) => ep[0] === pieceId)!
-      if (el[1].length === 2) {
+      if (el[1].length === 1) {
         this.paths.splice(
           this.paths.findIndex((p) => p[0] === pieceId),
           1,
         )
       } else {
         el[1].shift()
-        el[1].shift()
-      }
-    },
-    updateDirection(pieceId: number, dir: direction) {
-      const pd = this.directions.find((ep) => ep[0] === pieceId)
-      if (pd) {
-        pd[1] = dir
-      } else {
-        this.directions.push([pieceId, dir])
       }
     },
   },
