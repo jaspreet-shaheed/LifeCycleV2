@@ -179,39 +179,41 @@ const select = function (x: number, y: number): void {
       </div>
     </div>
     <div class="row">
-      <table>
-        <tr v-for="yCoord in numbers" :key="yCoord">
-          <td
-            v-for="xCoord in numbers"
-            :key="xCoord + ' ' + yCoord"
-            style="height: 30px; width: 30px"
-            @dragover="dragOver(xCoord, yCoord)"
-            v-bind:class="isPieceSquare(xCoord, yCoord) ? identifyPieceClass(xCoord, yCoord) : ''"
-          >
-            <div v-if="isHorizontalRoute(xCoord, yCoord) || isVerticalRoute(xCoord, yCoord)">
-              <hr
-                :class="identifyPathClass(xCoord, yCoord)"
-                v-if="isHorizontalRoute(xCoord, yCoord)"
-              />
-              <hr
-                :class="identifyPathClass(xCoord, yCoord)"
-                v-if="isVerticalRoute(xCoord, yCoord)"
-              />
-            </div>
-
-            <div v-if="isPieceSquare(xCoord, yCoord)">
-              <transition name="pieceMove">
-                <GamePiece
-                  v-if="hasPiece(xCoord, yCoord)"
-                  :piece-data="getPieceData(xCoord, yCoord)"
-                  @click="select(xCoord, yCoord)"
-                  @drag-begin="dragBegin"
+      <div class="d-flex justify-content-center">
+        <table>
+          <tr v-for="yCoord in numbers" :key="yCoord">
+            <td
+              v-for="xCoord in numbers"
+              :key="xCoord + ' ' + yCoord"
+              style="height: 30px; width: 30px"
+              @dragover="dragOver(xCoord, yCoord)"
+              v-bind:class="isPieceSquare(xCoord, yCoord) ? identifyPieceClass(xCoord, yCoord) : ''"
+            >
+              <div v-if="isHorizontalRoute(xCoord, yCoord) || isVerticalRoute(xCoord, yCoord)">
+                <hr
+                  :class="identifyPathClass(xCoord, yCoord)"
+                  v-if="isHorizontalRoute(xCoord, yCoord)"
                 />
-              </transition>
-            </div>
-          </td>
-        </tr>
-      </table>
+                <hr
+                  :class="identifyPathClass(xCoord, yCoord)"
+                  v-if="isVerticalRoute(xCoord, yCoord)"
+                />
+              </div>
+
+              <div v-if="isPieceSquare(xCoord, yCoord)">
+                <transition name="pieceMove">
+                  <GamePiece
+                    v-if="hasPiece(xCoord, yCoord)"
+                    :piece-data="getPieceData(xCoord, yCoord)"
+                    @click="select(xCoord, yCoord)"
+                    @drag-begin="dragBegin"
+                  />
+                </transition>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
   </div>
 </template>
