@@ -9,7 +9,7 @@ const props = defineProps<{
 <template>
   <div style="height: 4rem"></div>
   <div v-if="props.selectedPiece">
-    <table>
+    <table class="table table-striped table-dark">
       <tbody>
         <tr>
           <td>PieceId</td>

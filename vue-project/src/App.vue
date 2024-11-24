@@ -90,16 +90,18 @@ onMounted(() => {
 
 <template>
   <div>
-    <div class="wrapper">
+    <div class="mt-5">
       <Title msg="The LifeCycle Game" style="text-align: center" />
     </div>
 
-    <div id="wrapper">
-      <div id="left">
-        <Grid :squares="7" :pieces="pieceLocations" @piece-selected="selectPiece"></Grid>
-      </div>
-      <div id="right">
-        <PieceInfo :selected-piece="getPiece(selectedPiece)"></PieceInfo>
+    <div class="container text-center">
+      <div class="row">
+        <div class="col">
+          <Grid :squares="7" :pieces="pieceLocations" @piece-selected="selectPiece"></Grid>
+        </div>
+        <div class="col">
+          <PieceInfo :selected-piece="getPiece(selectedPiece)"></PieceInfo>
+        </div>
       </div>
     </div>
   </div>
@@ -108,17 +110,5 @@ onMounted(() => {
 <style scoped>
 header {
   line-height: 1.5;
-}
-
-#wrapper {
-  display: flex;
-}
-
-#left {
-  flex: 0 0 65%;
-}
-
-#right {
-  flex: 1;
 }
 </style>
