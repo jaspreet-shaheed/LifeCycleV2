@@ -63,12 +63,4 @@ const getId = function () {
   display: inline-block;
   border-style: dotted;
 }
-
-.human {
-  background-color: green;
-}
-
-.ai {
-  background-color: red;
-}
 </style>

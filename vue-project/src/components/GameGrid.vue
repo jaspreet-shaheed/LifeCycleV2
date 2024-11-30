@@ -40,9 +40,13 @@ const getPieceData = function (x: number, y: number): PieceData {
   throw new Error('No piece here')
 }
 
-const selectedX = ref(-1),
-  selectedY = ref(-1),
-  pieceBeingPlanned = ref(-1)
+const getPieceLocation = function (pId: number): [number, number] {
+  const piece = props.pieces.find((p) => p[0].id == pId)!
+  return [piece[1], piece[2]]
+}
+
+const pieceBeingPlanned = ref(-1),
+  pieceSelected = ref(-1)
 
 // eslint-disable-next-line prefer-const
 let pathBeingPlanned: [number, number][] = reactive([])
@@ -70,11 +74,10 @@ const dragBegin = function (event: DragEvent, pieceId: number): void {
 }
 
 const dragOver = function (x: number, y: number): void {
-  console.log('dragover:', x, y)
   if (isNothingSquare(x, y)) {
     cancelPath()
   }
-  if (pathBeingPlanned.length === 0 && selectedX.value !== -1) {
+  if (pathBeingPlanned.length === 0 && pieceBeingPlanned.value !== -1) {
     pathBeingPlanned.push([x, y])
   } else if (pathBeingPlanned.length > 0) {
     const [firstX, firstY] = pathBeingPlanned[0]
@@ -84,7 +87,6 @@ const dragOver = function (x: number, y: number): void {
         (Math.abs(firstX - x) == 2 && Math.abs(firstY - y) == 0)
       ) {
         // valid path
-        console.log('Valid path')
         pathBeingPlanned.unshift([x, y])
       }
     }
@@ -99,8 +101,6 @@ const acceptPath = function (): void {
 const cancelPath = function (): void {
   pieceBeingPlanned.value = -1
   pathBeingPlanned.splice(0)
-  selectedX.value = -1
-  selectedY.value = -1
 }
 
 const isHorizontalRoute = function (x: number, y: number): boolean {
@@ -116,7 +116,11 @@ const isPieceSquare = function (x: number, y: number): boolean {
 }
 
 const isSelected = function (x: number, y: number): boolean {
-  return x === selectedX.value && y === selectedY.value
+  if (pieceSelected.value !== -1) {
+    const loc = getPieceLocation(pieceSelected.value)
+    return x === loc[0] && y === loc[1]
+  }
+  return false
 }
 
 const isNothingSquare = function (x: number, y: number): boolean {
@@ -161,11 +165,9 @@ const identifyPieceClass = function (x: number, y: number): string {
 }
 
 const select = function (x: number, y: number): void {
-  selectedX.value = x
-  selectedY.value = y
   const pd = getPieceData(x, y)
   if (pd) {
-    console.log('pieceSeleted', pd.id)
+    pieceSelected.value = pd.id
     emit('pieceSelected', pd.id)
   }
 }
@@ -290,5 +292,15 @@ const select = function (x: number, y: number): void {
   border: 2px;
   border-style: dashed;
   border-color: white;
+}
+
+.blink_me {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
 }
 </style>
