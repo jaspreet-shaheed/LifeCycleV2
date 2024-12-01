@@ -51,21 +51,32 @@ const pieceBeingPlanned = ref(-1),
 // eslint-disable-next-line prefer-const
 let pathBeingPlanned: [number, number][] = reactive([])
 
+const pairwise = function pairwise(
+  arr: [number, number][],
+  func: (first: [number, number], second: [number, number]) => boolean,
+): boolean {
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (func(arr[i], arr[i + 1])) return true
+  }
+  return false
+}
+
+const routeInPath = function (x: number, y: number, path: [number, number][]): boolean {
+  if (isPieceSquare(x, y)) {
+    return path.some((p) => p[0] === x && p[1] === y)
+  }
+
+  return pairwise(path, (first: [number, number], second: [number, number]) => {
+    return (first[0] + second[0]) / 2 === x && (first[1] + second[1]) / 2 === y
+  })
+}
+
 const routeBeingUsed = function (x: number, y: number): boolean {
-  return (
-    pathBeingPlanned.findIndex((e: [number, number]) => {
-      return e[0] === x && e[1] === y
-    }) !== -1
-  )
+  return routeInPath(x, y, pathBeingPlanned)
 }
 
 const routeInFinishedPaths = function (x: number, y: number): boolean {
-  return getStore().allPaths.some(
-    (e) =>
-      e[1].findIndex((p: [number, number]) => {
-        return p[0] === x && p[1] === y
-      }) !== -1,
-  )
+  return getStore().allPaths.some((e) => routeInPath(x, y, e[1]))
 }
 
 const dragBegin = function (event: DragEvent, pieceId: number): void {
@@ -127,43 +138,6 @@ const isNothingSquare = function (x: number, y: number): boolean {
   return y % 2 == 1 && x % 2 == 1
 }
 
-const identifyPathClass = function (x: number, y: number): string {
-  if (routeBeingUsed(x, y)) {
-    if (isHorizontalRoute(x, y)) {
-      return 'selectedXPath'
-    } else if (isVerticalRoute(x, y)) {
-      return 'selectedYPath'
-    }
-  } else if (routeInFinishedPaths(x, y)) {
-    if (isHorizontalRoute(x, y)) {
-      return 'selectedB4XPath'
-    } else if (isVerticalRoute(x, y)) {
-      return 'selectedB4YPath'
-    }
-  } else {
-    if (isHorizontalRoute(x, y)) {
-      return 'xPath'
-    } else if (isVerticalRoute(x, y)) {
-      return 'yPath'
-    }
-  }
-  return ''
-}
-
-const identifyPieceClass = function (x: number, y: number): string {
-  if (isSelected(x, y)) {
-    return 'selectedPiece'
-  }
-
-  if (routeBeingUsed(x, y)) {
-    return 'selectedPiecePath'
-  } else if (routeInFinishedPaths(x, y)) {
-    return 'selectedB4PiecePath'
-  } else {
-    return 'piece'
-  }
-}
-
 const select = function (x: number, y: number): void {
   const pd = getPieceData(x, y)
   if (pd) {
@@ -191,21 +165,26 @@ const select = function (x: number, y: number): void {
               v-for="xCoord in numbers"
               :key="xCoord + ' ' + yCoord"
               style="height: 30px; width: 30px"
-              v-bind:class="isPieceSquare(xCoord, yCoord) ? identifyPieceClass(xCoord, yCoord) : ''"
+              v-bind:class="{
+                piece: isPieceSquare(xCoord, yCoord),
+                selected: isSelected(xCoord, yCoord),
+                selectedPiece: routeBeingUsed(xCoord, yCoord),
+                selectedB4Piece: routeInFinishedPaths(xCoord, yCoord),
+              }"
               @dragover="dragOver(xCoord, yCoord)"
             >
               <div v-if="isHorizontalRoute(xCoord, yCoord) || isVerticalRoute(xCoord, yCoord)">
                 <hr
-                  :class="identifyPathClass(xCoord, yCoord)"
-                  v-if="isHorizontalRoute(xCoord, yCoord)"
-                />
-                <hr
-                  :class="identifyPathClass(xCoord, yCoord)"
-                  v-if="isVerticalRoute(xCoord, yCoord)"
+                  :class="{
+                    path: true,
+                    xPath: isHorizontalRoute(xCoord, yCoord),
+                    yPath: isVerticalRoute(xCoord, yCoord),
+                    selectedPath: routeBeingUsed(xCoord, yCoord),
+                    selectedB4Path: routeInFinishedPaths(xCoord, yCoord),
+                  }"
                 />
               </div>
-
-              <div v-if="isPieceSquare(xCoord, yCoord)">
+              <div v-else>
                 <transition name="pieceMove">
                   <GamePiece
                     v-if="hasPiece(xCoord, yCoord)"
@@ -234,73 +213,55 @@ const select = function (x: number, y: number): void {
   opacity: 0;
 }
 
-.selectedXPath {
-  vertical-align: middle;
+.selectedPath.path {
   border-color: lime;
+  animation: blink 1s infinite;
 }
 
-.selectedYPath {
-  transform: rotate(90deg);
-  border-color: lime;
-}
-
-.selectedB4XPath {
-  vertical-align: middle;
-  border-style: dashed;
+.selectedB4Path.path {
   border-color: blue;
+  animation: blink 1s infinite;
 }
 
-.selectedB4YPath {
-  transform: rotate(90deg);
-  border-style: dashed;
-  border-color: blue;
-}
-
-.selectedPiecePath {
-  border: 2px;
-  border-style: solid;
-  border-color: lime;
-}
-
-.selectedB4PiecePath {
-  border: 2px;
-  border-style: solid;
-  border-color: blue;
-}
-
-.xPath {
-  vertical-align: middle;
+.path {
   width: 30px;
   border-style: dashed;
   border-color: white;
 }
 
-.yPath {
-  transform: rotate(90deg);
-  width: 30px;
-  border-style: dashed;
-  border-color: white;
+.xPath.path {
+  vertical-align: middle;
 }
 
-.selectedPiece {
-  border: 2px;
-  border-style: solid;
+.yPath.path {
+  transform: rotate(90deg);
+}
+
+.selectedPiece.piece {
   border-color: lime;
+  animation: blink 0.5s infinite;
+}
+
+.selectedB4Piece.piece {
+  border-color: blue;
+  animation: blink 0.5s infinite;
+}
+
+.selected.piece {
+  border-color: lime;
+  border-style: solid;
+  animation: blink 1s;
+  animation-iteration-count: 3;
 }
 
 .piece {
   border: 2px;
   border-style: dashed;
-  border-color: white;
 }
 
-.blink_me {
-  animation: blinker 1s linear infinite;
-}
-
-@keyframes blinker {
+@keyframes blink {
   50% {
-    opacity: 0;
+    border-color: white;
   }
 }
 </style>
