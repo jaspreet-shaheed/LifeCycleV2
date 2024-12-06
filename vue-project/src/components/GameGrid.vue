@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import * as _ from 'lodash'
 import GamePiece from './GamePiece.vue'
 import PieceData from './PieceData.js'
 import { onMounted, reactive, ref } from 'vue'
@@ -25,7 +24,15 @@ onMounted(() => {
   storeReady = true
 })
 
-const numbers = _.range(0, props.squares * 2 - 1, 1)
+function range(start: number, end: number): number[] {
+  const ans = []
+  for (let i = start; i <= end; i++) {
+    ans.push(i)
+  }
+  return ans
+}
+
+const numbers = range(0, props.squares * 2 - 1)
 
 const hasPiece = function (x: number, y: number): boolean {
   const findIndex = props.pieces.findIndex((p) => p[1] === x && p[2] === y)
