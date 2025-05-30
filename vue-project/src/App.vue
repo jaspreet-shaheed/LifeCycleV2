@@ -10,9 +10,9 @@ const human1 = ref(new PieceData(1, true, 0, 0))
 const human2 = ref(new PieceData(2, true, 0, 0))
 const human3 = ref(new PieceData(3, true, 0, 0))
 
-const aiPiece1 = ref(new PieceData(4, false, 0, 0))
-const aiPiece2 = ref(new PieceData(5, false, 0, 0))
-const aiPiece3 = ref(new PieceData(6, false, 0, 0))
+const aiPiece1 = ref(new PieceData(4, false, 50, 0))
+const aiPiece2 = ref(new PieceData(5, false, 50, 0))
+const aiPiece3 = ref(new PieceData(6, false, 50, 0))
 
 const pieceLocations: [PieceData, number, number][] = []
 
@@ -42,14 +42,10 @@ const tick = function (): void {
     if (pl[0].readyToMove()) {
       console.log('Ready to move', pl[0].id)
       console.log('From (' + pl[1] + ',' + pl[2] + ') to (' + el[1][0] + ',' + el[1][1] + ')')
-      //const dir = getDirection(pl[1], pl[2], el[1][0], el[1][1])
       pl[0].move()
       pl[1] = el[1][0]
       pl[2] = el[1][1]
       getStore().makeMove(pl[0].id)
-
-      //console.log('Setting direction for piece: ' + pl[0].id + ' ' + dir)
-      //getStore().updateDirection(pl[0].id, dir)
     }
   })
 }

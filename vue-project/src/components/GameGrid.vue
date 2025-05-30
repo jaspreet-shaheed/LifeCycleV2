@@ -99,14 +99,12 @@ const dragOver = function (x: number, y: number): void {
     pathBeingPlanned.push([x, y])
   } else if (pathBeingPlanned.length > 0) {
     const [firstX, firstY] = pathBeingPlanned[0]
-    if (!(firstX === x && firstY === y)) {
-      if (
-        (Math.abs(firstX - x) == 0 && Math.abs(firstY - y) == 2) ||
-        (Math.abs(firstX - x) == 2 && Math.abs(firstY - y) == 0)
-      ) {
-        // valid path
-        pathBeingPlanned.unshift([x, y])
-      }
+    if (
+      (Math.abs(firstX - x) == 0 && Math.abs(firstY - y) == 2) ||
+      (Math.abs(firstX - x) == 2 && Math.abs(firstY - y) == 0)
+    ) {
+      // valid path
+      pathBeingPlanned.unshift([x, y])
     }
   }
 }
