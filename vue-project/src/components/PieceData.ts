@@ -33,17 +33,19 @@ export default class PieceData {
     if (this._readyToMovePercent < 100) {
       this._readyToMovePercent++
     }
-    if (this._goingUp) {
-      if (this._lifeStrength < 100) {
-        this._lifeStrength++
+    if (this.isHuman) {
+      if (this._goingUp) {
+        if (this._lifeStrength < 100) {
+          this._lifeStrength++
+        } else {
+          this._goingUp = false
+        }
       } else {
-        this._goingUp = false
-      }
-    } else {
-      if (this._lifeStrength > 0) {
-        this._lifeStrength--
-      } else {
-        this._goingUp = true
+        if (this._lifeStrength > 0) {
+          this._lifeStrength--
+        } else {
+          this._goingUp = true
+        }
       }
     }
   }

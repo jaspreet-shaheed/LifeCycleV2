@@ -40,19 +40,12 @@ export const pathStore = defineStore('paths', {
       const reversedPath = itsPath.reverse()
       reversedPath.shift()
 
-      if (reversedPath.length % 2 === 0) {
-        console.log(
-          'Adding path ',
-          reversedPath.map((c) => '(' + c[0] + ',' + c[1] + ')'),
-        )
-
-        const el = this.paths.find((ep) => ep[0] === pieceId)
-        if (el) {
-          el[1] = [...reversedPath]
-        } else {
-          const newEl: [number, [number, number][]] = [pieceId, [...reversedPath]]
-          this.paths.push(newEl)
-        }
+      const el = this.paths.find((ep) => ep[0] === pieceId)
+      if (el) {
+        el[1] = [...reversedPath]
+      } else {
+        const newEl: [number, [number, number][]] = [pieceId, [...reversedPath]]
+        this.paths.push(newEl)
       }
     },
     makeMove(pieceId: number) {
