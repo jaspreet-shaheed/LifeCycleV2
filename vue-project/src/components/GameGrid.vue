@@ -44,7 +44,7 @@ const getPieceData = function (x: number, y: number): PieceData {
   if (findIndex !== -1) {
     return props.pieces[findIndex][0]
   }
-  throw new Error('No piece here')
+  return null
 }
 
 const getPieceLocation = function (pId: number): [number, number] {
@@ -86,33 +86,22 @@ const routeInFinishedPaths = function (x: number, y: number): boolean {
   return getStore().allPaths.some((e) => routeInPath(x, y, e[1]))
 }
 
-const dragBegin = function (event: DragEvent, pieceId: number): void {
-  pieceBeingPlanned.value = pieceId
-  pathBeingPlanned.splice(0)
-}
-
 const mouseOver = function (x: number, y: number): void {
-  console.log('mouseover', x, y)
-}
-
-const dragOver = function (x: number, y: number): void {
-  //if (isAISelected) {
-  //  return
-  //}
-
-  if (isNothingSquare(x, y)) {
-    cancelPath()
-  }
-  if (pathBeingPlanned.length === 0 && pieceBeingPlanned.value !== -1) {
-    pathBeingPlanned.push([x, y])
-  } else if (pathBeingPlanned.length > 0) {
-    const [firstX, firstY] = pathBeingPlanned[0]
-    if (
-      (Math.abs(firstX - x) == 0 && Math.abs(firstY - y) == 2) ||
-      (Math.abs(firstX - x) == 2 && Math.abs(firstY - y) == 0)
-    ) {
-      // valid path
-      pathBeingPlanned.unshift([x, y])
+  if (shouldCapturePath) {
+    if (isNothingSquare(x, y)) {
+      cancelPath()
+    }
+    if (pathBeingPlanned.length === 0 && pieceBeingPlanned.value !== -1) {
+      pathBeingPlanned.push([x, y])
+    } else if (pathBeingPlanned.length > 0) {
+      const [firstX, firstY] = pathBeingPlanned[0]
+      if (
+        (Math.abs(firstX - x) == 0 && Math.abs(firstY - y) == 2) ||
+        (Math.abs(firstX - x) == 2 && Math.abs(firstY - y) == 0)
+      ) {
+        // valid path
+        pathBeingPlanned.unshift([x, y])
+      }
     }
   }
 }
@@ -151,12 +140,19 @@ const isNothingSquare = function (x: number, y: number): boolean {
   return y % 2 == 1 && x % 2 == 1
 }
 
-let isAISelected = false
+let shouldCapturePath = false
 const select = function (x: number, y: number): void {
+  if (pathBeingPlanned && pathBeingPlanned.length > 1) {
+    acceptPath()
+  }
+
   const pd = getPieceData(x, y)
   if (pd) {
-    if (!pd.isHuman) {
-      isAISelected = true
+    if (pd.isHuman) {
+      shouldCapturePath = true
+      pieceBeingPlanned.value = pd.id
+      pathBeingPlanned.splice(0)
+      pathBeingPlanned.push([x, y])
     }
     pieceSelected.value = pd.id
     emit('pieceSelected', pd.id)
@@ -181,6 +177,7 @@ const select = function (x: number, y: number): void {
             <td
               v-for="xCoord in numbers"
               :key="xCoord + ' ' + yCoord"
+              @click="select(xCoord, yCoord)"
               style="height: 30px; width: 30px"
               v-bind:class="{
                 piece: isPieceSquare(xCoord, yCoord),
@@ -188,7 +185,6 @@ const select = function (x: number, y: number): void {
                 selectedPiece: routeBeingUsed(xCoord, yCoord),
                 selectedB4Piece: routeInFinishedPaths(xCoord, yCoord),
               }"
-              @dragover="dragOver(xCoord, yCoord)"
               @mouseover="mouseOver(xCoord, yCoord)"
             >
               <div v-if="isHorizontalRoute(xCoord, yCoord) || isVerticalRoute(xCoord, yCoord)">
@@ -208,9 +204,9 @@ const select = function (x: number, y: number): void {
                     v-if="hasPiece(xCoord, yCoord)"
                     :piece-data="getPieceData(xCoord, yCoord)"
                     @click="select(xCoord, yCoord)"
-                    @drag-begin="dragBegin"
                   />
                 </transition>
+                <div v-if="!hasPiece(xCoord, yCoord)"></div>
               </div>
             </td>
           </tr>
@@ -237,7 +233,7 @@ const select = function (x: number, y: number): void {
 }
 
 .selectedB4Path.path {
-  border-color: blue;
+  border-color: lightgreen;
   animation: blink 1s infinite;
 }
 
@@ -261,7 +257,7 @@ const select = function (x: number, y: number): void {
 }
 
 .selectedB4Piece.piece {
-  border-color: blue;
+  border-color: lightgreen;
   animation: blink 0.5s infinite;
 }
 
