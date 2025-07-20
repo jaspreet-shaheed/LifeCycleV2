@@ -73,10 +73,6 @@ const routeInPath = function (x: number, y: number, path: [number, number][]): b
   })
 }
 
-const routeBeingUsed = function (x: number, y: number): boolean {
-  return routeInPath(x, y, pathBeingPlanned)
-}
-
 const routeInFinishedPaths = function (x: number, y: number): boolean {
   return getStore().allPaths.some((e) => routeInPath(x, y, e[1]))
 }
@@ -143,6 +139,10 @@ const isNothingSquare = function (x: number, y: number): boolean {
   return y % 2 == 1 && x % 2 == 1
 }
 
+const touchOver = function (x: number, y: number): void {
+  console.log('touchover', x, y)
+}
+
 let shouldCapturePath = false
 const select = function (x: number, y: number): void {
   if (pathBeingPlanned && pathBeingPlanned.length > 1) {
@@ -160,6 +160,13 @@ const select = function (x: number, y: number): void {
     pieceSelected.value = pd.id
     emit('pieceSelected', pd.id)
   }
+}
+
+const reachableFromSelected = function ([x, y]: [number, number]): boolean {
+  if (pieceSelected.value === -1) return false
+
+  const loc = getPieceLocation(pieceSelected.value)
+  return (x === loc[0] || y === loc[1]) && !(x === loc[0] && y === loc[1])
 }
 </script>
 
@@ -183,13 +190,14 @@ const select = function (x: number, y: number): void {
               @click="select(xCoord, yCoord)"
               style="height: 30px; width: 30px"
               v-bind:class="{
+                node: true,
                 piece: isPieceSquare(xCoord, yCoord),
                 selected: isSelected(xCoord, yCoord),
-                selectedPiece: routeBeingUsed(xCoord, yCoord),
-                selectedB4Piece: routeInFinishedPaths(xCoord, yCoord),
+                candidate: reachableFromSelected([xCoord, yCoord]),
+                stored: routeInFinishedPaths(xCoord, yCoord),
               }"
               @mouseover="mouseOver(xCoord, yCoord)"
-              @touchover="mouseOver(xCoord, yCoord)"
+              @touchover="touchOver(xCoord, yCoord)"
             >
               <div v-if="isHorizontalRoute(xCoord, yCoord) || isVerticalRoute(xCoord, yCoord)">
                 <hr
@@ -197,8 +205,8 @@ const select = function (x: number, y: number): void {
                     path: true,
                     xPath: isHorizontalRoute(xCoord, yCoord),
                     yPath: isVerticalRoute(xCoord, yCoord),
-                    selectedPath: routeBeingUsed(xCoord, yCoord),
-                    selectedB4Path: routeInFinishedPaths(xCoord, yCoord),
+                    candidate: reachableFromSelected([xCoord, yCoord]),
+                    stored: routeInFinishedPaths(xCoord, yCoord),
                   }"
                 />
               </div>
@@ -210,7 +218,6 @@ const select = function (x: number, y: number): void {
                     @click="select(xCoord, yCoord)"
                   />
                 </transition>
-                <div v-if="!hasPiece(xCoord, yCoord)"></div>
               </div>
             </td>
           </tr>
@@ -231,20 +238,30 @@ const select = function (x: number, y: number): void {
   opacity: 0;
 }
 
-.selectedPath.path {
-  border-color: lime;
-  animation: blink 1s infinite;
+.candidate.path {
+  border-color: darkgrey;
+  animation: blink 2s infinite;
 }
 
-.selectedB4Path.path {
-  border-color: lightgreen;
-  animation: blink 1s infinite;
+.stored.path {
+  border-color: darkgrey;
+  animation: blink 2s infinite;
+}
+
+.candidate.node {
+  border-color: darkgrey;
+  animation: blink 2s infinite;
+}
+
+.stored.node {
+  border-color: darkgrey;
+  animation: blink 2s infinite;
 }
 
 .path {
   width: 28px;
   border-style: solid;
-  border-color: white;
+  border-color: gray;
 }
 
 .xPath.path {
@@ -253,16 +270,6 @@ const select = function (x: number, y: number): void {
 
 .yPath.path {
   transform: rotate(90deg);
-}
-
-.selectedPiece.piece {
-  border-color: lime;
-  animation: blink 0.5s infinite;
-}
-
-.selectedB4Piece.piece {
-  border-color: lightgreen;
-  animation: blink 0.5s infinite;
 }
 
 .selected.piece {
@@ -274,13 +281,13 @@ const select = function (x: number, y: number): void {
 
 .piece {
   border: 2px;
-  border-color: black;
+  border-color: rgb(100, 100, 100);
   border-style: solid;
 }
 
 @keyframes blink {
   50% {
-    border-color: white;
+    border-color: gray(19, 19, 19);
   }
 }
 </style>
