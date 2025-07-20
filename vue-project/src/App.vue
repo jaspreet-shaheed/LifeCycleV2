@@ -91,4 +91,9 @@ onMounted(() => {
 header {
   line-height: 1.5;
 }
+
+html,
+body {
+  overscroll-behavior: none;
+}
 </style>
