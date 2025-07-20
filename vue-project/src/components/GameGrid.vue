@@ -189,6 +189,7 @@ const select = function (x: number, y: number): void {
                 selectedB4Piece: routeInFinishedPaths(xCoord, yCoord),
               }"
               @mouseover="mouseOver(xCoord, yCoord)"
+              @touchover="mouseOver(xCoord, yCoord)"
             >
               <div v-if="isHorizontalRoute(xCoord, yCoord) || isVerticalRoute(xCoord, yCoord)">
                 <hr
