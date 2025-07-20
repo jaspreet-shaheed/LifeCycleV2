@@ -167,10 +167,10 @@ const select = function (x: number, y: number): void {
   <div class="container">
     <div class="row">
       <div>
-        <button type="button" class="btn btn-success" @click="acceptPath">Set Path</button>
+        <!-- <button type="button" class="btn btn-success" @click="acceptPath">Set Path</button>
         &nbsp;
         <button type="button" class="btn btn-danger" @click="cancelPath">Cancel</button>
-        <hr />
+        <hr /> -->
       </div>
     </div>
     <div class="row">
