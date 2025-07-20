@@ -39,17 +39,12 @@ const hasPiece = function (x: number, y: number): boolean {
   return findIndex !== -1
 }
 
-const getPieceData = function (x: number, y: number): PieceData {
+const getPieceData = function (x: number, y: number): PieceData | null {
   const findIndex = props.pieces.findIndex((p) => p[1] === x && p[2] === y)
   if (findIndex !== -1) {
     return props.pieces[findIndex][0]
   }
   return null
-}
-
-const getPieceLocation = function (pId: number): [number, number] {
-  const piece = props.pieces.find((p) => p[0].id == pId)!
-  return [piece[1], piece[2]]
 }
 
 const pieceBeingPlanned = ref(-1),
@@ -114,6 +109,14 @@ const acceptPath = function (): void {
 const cancelPath = function (): void {
   pieceBeingPlanned.value = -1
   pathBeingPlanned.splice(0)
+}
+
+const getPieceLocation = function (id: number): [x: number, y: number] {
+  const pieceAndLocation = props.pieces.find((p) => p[0].id === id)
+  if (pieceAndLocation) {
+    return [pieceAndLocation[1], pieceAndLocation[2]]
+  }
+  throw new Error('Cannot get location of piece ' + id)
 }
 
 const isHorizontalRoute = function (x: number, y: number): boolean {
@@ -202,7 +205,7 @@ const select = function (x: number, y: number): void {
                 <transition name="pieceMove">
                   <GamePiece
                     v-if="hasPiece(xCoord, yCoord)"
-                    :piece-data="getPieceData(xCoord, yCoord)"
+                    :piece-data="getPieceData(xCoord, yCoord)!"
                     @click="select(xCoord, yCoord)"
                   />
                 </transition>

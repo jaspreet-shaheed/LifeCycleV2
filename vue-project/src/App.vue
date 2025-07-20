@@ -57,6 +57,7 @@ function getStore() {
         makeMove: (_: number) => {},
         getDirections: [],
         updateDirection: (_: number, _d: direction) => {},
+        pieceLocations: [],
       }
 }
 
