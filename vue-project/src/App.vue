@@ -26,7 +26,6 @@ pieceLocations.push([aiPiece3.value as PieceData, 12, 12])
 
 const selectedPiece = ref(-1)
 const selectPiece = function (pieceId: number) {
-  console.log('selecting piece: ' + pieceId)
   selectedPiece.value = pieceId
 }
 
@@ -40,8 +39,6 @@ const tick = function (): void {
   nextMoves.forEach((el) => {
     const pl = getPieceLocation(el[0])!
     if (pl[0].readyToMove()) {
-      console.log('Ready to move', pl[0].id)
-      console.log('From (' + pl[1] + ',' + pl[2] + ') to (' + el[1][0] + ',' + el[1][1] + ')')
       pl[0].move()
       pl[1] = el[1][0]
       pl[2] = el[1][1]

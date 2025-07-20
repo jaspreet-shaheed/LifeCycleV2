@@ -56,11 +56,12 @@ const getId = function () {
 }
 
 .dot {
-  height: 30px;
-  width: 30px;
+  height: 28px;
+  width: 28px;
   margin: auto;
   border-radius: 50%;
   display: inline-block;
-  border-style: dotted;
+  border-style: solid;
+  border-color: black;
 }
 </style>

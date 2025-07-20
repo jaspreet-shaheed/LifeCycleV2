@@ -91,7 +91,15 @@ const dragBegin = function (event: DragEvent, pieceId: number): void {
   pathBeingPlanned.splice(0)
 }
 
+const mouseOver = function (x: number, y: number): void {
+  console.log('mouseover', x, y)
+}
+
 const dragOver = function (x: number, y: number): void {
+  //if (isAISelected) {
+  //  return
+  //}
+
   if (isNothingSquare(x, y)) {
     cancelPath()
   }
@@ -143,9 +151,13 @@ const isNothingSquare = function (x: number, y: number): boolean {
   return y % 2 == 1 && x % 2 == 1
 }
 
+let isAISelected = false
 const select = function (x: number, y: number): void {
   const pd = getPieceData(x, y)
   if (pd) {
+    if (!pd.isHuman) {
+      isAISelected = true
+    }
     pieceSelected.value = pd.id
     emit('pieceSelected', pd.id)
   }
@@ -177,6 +189,7 @@ const select = function (x: number, y: number): void {
                 selectedB4Piece: routeInFinishedPaths(xCoord, yCoord),
               }"
               @dragover="dragOver(xCoord, yCoord)"
+              @mouseover="mouseOver(xCoord, yCoord)"
             >
               <div v-if="isHorizontalRoute(xCoord, yCoord) || isVerticalRoute(xCoord, yCoord)">
                 <hr
@@ -229,8 +242,8 @@ const select = function (x: number, y: number): void {
 }
 
 .path {
-  width: 30px;
-  border-style: dashed;
+  width: 28px;
+  border-style: solid;
   border-color: white;
 }
 
@@ -261,7 +274,8 @@ const select = function (x: number, y: number): void {
 
 .piece {
   border: 2px;
-  border-style: dashed;
+  border-color: black;
+  border-style: solid;
 }
 
 @keyframes blink {
