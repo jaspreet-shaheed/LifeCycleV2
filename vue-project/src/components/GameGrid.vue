@@ -26,8 +26,14 @@ onMounted(() => {
 
 function range(start: number, end: number): number[] {
   const ans = []
-  for (let i = start; i < end; i++) {
-    ans.push(i)
+  if (start < end) {
+    for (let i = start; i < end; i++) {
+      ans.push(i)
+    }
+  } else {
+    for (let i = start; i < end; i--) {
+      ans.push(i)
+    }
   }
   return ans
 }
@@ -77,26 +83,6 @@ const routeInFinishedPaths = function (x: number, y: number): boolean {
   return getStore().allPaths.some((e) => routeInPath(x, y, e[1]))
 }
 
-const mouseOver = function (x: number, y: number): void {
-  if (shouldCapturePath) {
-    if (isNothingSquare(x, y)) {
-      cancelPath()
-    }
-    if (pathBeingPlanned.length === 0 && pieceBeingPlanned.value !== -1) {
-      pathBeingPlanned.push([x, y])
-    } else if (pathBeingPlanned.length > 0) {
-      const [firstX, firstY] = pathBeingPlanned[0]
-      if (
-        (Math.abs(firstX - x) == 0 && Math.abs(firstY - y) == 2) ||
-        (Math.abs(firstX - x) == 2 && Math.abs(firstY - y) == 0)
-      ) {
-        // valid path
-        pathBeingPlanned.unshift([x, y])
-      }
-    }
-  }
-}
-
 const acceptPath = function (): void {
   getStore().addPath(pieceBeingPlanned.value, pathBeingPlanned)
   cancelPath()
@@ -135,30 +121,34 @@ const isSelected = function (x: number, y: number): boolean {
   return false
 }
 
-const isNothingSquare = function (x: number, y: number): boolean {
-  return y % 2 == 1 && x % 2 == 1
-}
-
-const touchOver = function (x: number, y: number): void {
-  console.log('touchover', x, y)
-}
-
-let shouldCapturePath = false
 const select = function (x: number, y: number): void {
-  if (pathBeingPlanned && pathBeingPlanned.length > 1) {
-    acceptPath()
-  }
-
-  const pd = getPieceData(x, y)
-  if (pd) {
-    if (pd.isHuman) {
-      shouldCapturePath = true
-      pieceBeingPlanned.value = pd.id
-      pathBeingPlanned.splice(0)
-      pathBeingPlanned.push([x, y])
+  console.log('select', x, y)
+  if (reachableFromSelected([x, y])) {
+    console.log('reachable', x, y)
+    const loc = getPieceLocation(pieceSelected.value)
+    pathBeingPlanned.splice(0)
+    if (loc[0] === x) {
+      range(loc[1], y).forEach((n) => pathBeingPlanned.unshift([x, n]))
+      pathBeingPlanned.unshift([x, y])
+      acceptPath()
+    } else if (loc[1] === y) {
+      range(loc[0], x).forEach((n) => pathBeingPlanned.unshift([n, y]))
+      pathBeingPlanned.unshift([x, y])
+      acceptPath()
+    } else {
+      throw new Error('Not reachable')
     }
-    pieceSelected.value = pd.id
-    emit('pieceSelected', pd.id)
+  } else {
+    const pd = getPieceData(x, y)
+    if (pd) {
+      if (pd.isHuman) {
+        pieceBeingPlanned.value = pd.id
+        pathBeingPlanned.splice(0)
+        pathBeingPlanned.push([x, y])
+      }
+      pieceSelected.value = pd.id
+      emit('pieceSelected', pd.id)
+    }
   }
 }
 
@@ -196,8 +186,6 @@ const reachableFromSelected = function ([x, y]: [number, number]): boolean {
                 candidate: reachableFromSelected([xCoord, yCoord]),
                 stored: routeInFinishedPaths(xCoord, yCoord),
               }"
-              @mouseover="mouseOver(xCoord, yCoord)"
-              @touchover="touchOver(xCoord, yCoord)"
             >
               <div v-if="isHorizontalRoute(xCoord, yCoord) || isVerticalRoute(xCoord, yCoord)">
                 <hr
@@ -215,7 +203,6 @@ const reachableFromSelected = function ([x, y]: [number, number]): boolean {
                   <GamePiece
                     v-if="hasPiece(xCoord, yCoord)"
                     :piece-data="getPieceData(xCoord, yCoord)!"
-                    @click="select(xCoord, yCoord)"
                   />
                 </transition>
               </div>
